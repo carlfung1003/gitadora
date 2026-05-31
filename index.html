@@ -87,6 +87,41 @@
     color: var(--accent-2);
     font-variant-numeric: tabular-nums;
   }
+  .hero-links {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    width: 100%;
+    margin-top: 4px;
+  }
+  .hero-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 999px;
+    color: var(--text);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.15s;
+  }
+  .hero-link:hover {
+    background: linear-gradient(135deg, rgba(192,132,252,0.25), rgba(34,211,238,0.18));
+    border-color: var(--accent);
+    transform: translateY(-1px);
+  }
+  .hero-link .konami {
+    font-size: 10px;
+    letter-spacing: 1.2px;
+    color: var(--text-faint);
+    text-transform: uppercase;
+    padding: 2px 6px;
+    background: rgba(0,0,0,0.3);
+    border-radius: 4px;
+  }
 
   /* CONTROLS */
   .controls {
@@ -341,6 +376,16 @@
     <div class="stat"><span class="label">DM Skill</span><span class="value">2822.32</span></div>
     <div class="stat"><span class="label">All Songs</span><span class="value">3219.22</span></div>
     <div class="stat"><span class="label">Songs</span><span class="value">41/50</span></div>
+  </div>
+  <div class="hero-links">
+    <a class="hero-link" href="https://p.eagate.573.jp/game/gfdm/gitadora_galaxywave_delta/p/setting/favorite1.html?gtype=dm" target="_blank">
+      <span class="konami">e-amusement</span>
+      Edit DM Favorites Folder ↗
+    </a>
+    <a class="hero-link" href="https://p.eagate.573.jp/game/gfdm/gitadora_galaxywave_delta/p/setting/favorite1.html" target="_blank">
+      <span class="konami">e-amusement</span>
+      Favorites Folder (all) ↗
+    </a>
   </div>
 </header>
 
