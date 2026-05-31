@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gitadora Favorites — CarlMeMayb</title>
+<style>
+  :root {
+    --bg: #0a0420;
+    --bg-2: #150930;
+    --card: rgba(31, 16, 64, 0.6);
+    --card-hover: rgba(56, 28, 110, 0.7);
+    --border: rgba(160, 100, 255, 0.18);
+    --border-hover: rgba(200, 140, 255, 0.45);
+    --text: #f0eaff;
+    --text-dim: #b8a8d8;
+    --text-faint: #7d6da0;
+    --accent: #c084fc;
+    --accent-2: #22d3ee;
+    --basic: #4FC3F7;
+    --advanced: #FFD54F;
+    --extreme: #FF5252;
+    --master: #E040FB;
+    --na: #4a3868;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    background: radial-gradient(ellipse at top, #1a0a3d 0%, var(--bg) 60%);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 32px 20px 80px;
+  }
+
+  /* HEADER */
+  .hero {
+    max-width: 1400px;
+    margin: 0 auto 28px;
+    padding: 28px 32px;
+    background: linear-gradient(135deg, rgba(192, 132, 252, 0.12), rgba(34, 211, 238, 0.08));
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 28px;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .hero h1 {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    background: linear-gradient(90deg, var(--accent) 0%, var(--accent-2) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .hero h1 .sub {
+    display: block;
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--text-dim);
+    margin-top: 4px;
+    -webkit-text-fill-color: var(--text-dim);
+  }
+  .stats {
+    display: flex;
+    gap: 22px;
+    flex-wrap: wrap;
+  }
+  .stat {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .stat .label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: var(--text-faint);
+  }
+  .stat .value {
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--accent-2);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* CONTROLS */
+  .controls {
+    max-width: 1400px;
+    margin: 0 auto 24px;
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .search {
+    flex: 1 1 280px;
+    min-width: 240px;
+    padding: 11px 16px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    font-size: 14px;
+    transition: border 0.15s;
+  }
+  .search::placeholder { color: var(--text-faint); }
+  .search:focus { outline: none; border-color: var(--accent); }
+
+  .chip {
+    padding: 8px 14px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    color: var(--text-dim);
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.15s;
+    user-select: none;
+  }
+  .chip:hover { border-color: var(--border-hover); color: var(--text); }
+  .chip.active {
+    background: linear-gradient(135deg, rgba(192,132,252,0.25), rgba(34,211,238,0.15));
+    border-color: var(--accent);
+    color: var(--text);
+  }
+  .count { color: var(--text-faint); font-size: 13px; margin-left: auto; }
+
+  /* GRID */
+  .grid {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 18px;
+  }
+
+  /* CARD */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.18s;
+    position: relative;
+  }
+  .card:hover {
+    border-color: var(--border-hover);
+    background: var(--card-hover);
+    transform: translateY(-2px);
+  }
+
+  /* VIDEO BLOCK */
+  .video-wrap {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background: #000;
+    overflow: hidden;
+    cursor: pointer;
+  }
+  .video-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.4s, filter 0.2s;
+  }
+  .video-wrap:hover img { transform: scale(1.04); filter: brightness(1.08); }
+  .play-btn {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+  }
+  .play-btn svg {
+    width: 64px;
+    height: 64px;
+    filter: drop-shadow(0 4px 16px rgba(0,0,0,0.6));
+    transition: transform 0.2s;
+  }
+  .video-wrap:hover .play-btn svg { transform: scale(1.1); }
+
+  .yt-open {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: rgba(0, 0, 0, 0.7);
+    color: #fff;
+    font-size: 11px;
+    padding: 4px 9px;
+    border-radius: 6px;
+    text-decoration: none;
+    backdrop-filter: blur(6px);
+    border: 1px solid rgba(255,255,255,0.14);
+    z-index: 2;
+    pointer-events: auto;
+    transition: background 0.15s;
+    line-height: 1.4;
+    font-weight: 500;
+  }
+  .yt-open:hover { background: rgba(255, 0, 0, 0.85); border-color: rgba(255,255,255,0.3); }
+  .video-wrap::after {
+    content: "Click → YouTube";
+    position: absolute;
+    bottom: 8px;
+    left: 8px;
+    font-size: 10px;
+    color: rgba(255,255,255,0.7);
+    background: rgba(0,0,0,0.55);
+    padding: 3px 8px;
+    border-radius: 999px;
+    pointer-events: none;
+    backdrop-filter: blur(4px);
+    letter-spacing: 0.3px;
+  }
+
+  .no-video {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background: linear-gradient(135deg, #1c0e3a, #2a1454);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 8px;
+    color: var(--text-faint);
+    font-size: 13px;
+    padding: 16px;
+    text-align: center;
+  }
+  .no-video .label {
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    opacity: 0.7;
+  }
+  .no-video a {
+    color: var(--accent-2);
+    font-size: 12px;
+    text-decoration: none;
+    border: 1px solid var(--border);
+    padding: 5px 12px;
+    border-radius: 999px;
+    margin-top: 4px;
+    transition: all 0.15s;
+  }
+  .no-video a:hover { border-color: var(--accent); color: var(--text); }
+
+  /* META */
+  .meta { padding: 14px 16px 16px; flex: 1; display: flex; flex-direction: column; gap: 10px; }
+  .num-tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--accent);
+    letter-spacing: 1px;
+  }
+  .title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.35;
+    margin: 0;
+    word-break: break-word;
+  }
+  .artist {
+    font-size: 12px;
+    color: var(--text-dim);
+    line-height: 1.4;
+  }
+  .diffs {
+    display: flex;
+    gap: 6px;
+    margin-top: auto;
+    flex-wrap: wrap;
+  }
+  .diff {
+    flex: 1;
+    min-width: 50px;
+    text-align: center;
+    padding: 6px 4px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-variant-numeric: tabular-nums;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+  .diff .lbl {
+    display: block;
+    font-size: 9px;
+    letter-spacing: 1px;
+    margin-bottom: 1px;
+    opacity: 0.75;
+  }
+  .diff .val { display: block; font-weight: 600; font-size: 13px; }
+  .diff.b { color: var(--basic); }
+  .diff.a { color: var(--advanced); }
+  .diff.e { color: var(--extreme); }
+  .diff.m { color: var(--master); }
+  .diff.na { color: var(--na); }
+
+  .alts {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    font-size: 11px;
+    padding-top: 4px;
+    border-top: 1px solid rgba(255,255,255,0.05);
+    margin-top: 4px;
+  }
+  .alts a {
+    color: var(--accent-2);
+    text-decoration: none;
+    opacity: 0.8;
+  }
+  .alts a:hover { opacity: 1; text-decoration: underline; }
+
+  /* FOOTER */
+  footer {
+    max-width: 1400px;
+    margin: 40px auto 0;
+    padding: 20px 0 0;
+    border-top: 1px solid var(--border);
+    color: var(--text-faint);
+    font-size: 12px;
+    text-align: center;
+    line-height: 1.6;
+  }
+  footer a { color: var(--accent-2); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+
+  /* Hide on filter */
+  .card.hidden { display: none; }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div>
+    <h1>
+      Gitadora Favorites — DrumMania
+      <span class="sub">CarlMeMayb · Cats and Cats · Favorites Folder 1 (GW DELTA)</span>
+    </h1>
+  </div>
+  <div class="stats">
+    <div class="stat"><span class="label">DM Skill</span><span class="value">2822.32</span></div>
+    <div class="stat"><span class="label">All Songs</span><span class="value">3219.22</span></div>
+    <div class="stat"><span class="label">Songs</span><span class="value">41/50</span></div>
+  </div>
+</header>
+
+<div class="controls">
+  <input class="search" id="search" placeholder="Search song or artist…" />
+  <span class="chip active" data-filter="all">All</span>
+  <span class="chip" data-filter="video">Has video</span>
+  <span class="chip" data-filter="no-video">No video</span>
+  <span class="chip" data-filter="classic">CLASSIC</span>
+  <span class="count" id="count">41 songs</span>
+</div>
+
+<main class="grid" id="grid"></main>
+
+<footer>
+  Built from 41 songs scraped from your e-amusement Favorites Folder 1.
+  Reference channels:
+  <a href="https://www.youtube.com/playlist?list=PLad7UutmN6RanxIVRQ_5GU3HdW_a7AcTe" target="_blank">DrumMania 譜面 (full)</a> ·
+  <a href="https://www.youtube.com/playlist?list=PLad7UutmN6RYHBm5Z7fgLkjVz8PN39UiP" target="_blank">GW DELTA only</a> ·
+  <a href="https://www.youtube.com/playlist?list=PLH8T8pp81qGqidCaDGi_FIjpGB34e7uns" target="_blank">GW (prior ver.)</a>
+</footer>
+
+<script>
+const SONGS = [
+  { n: 1,  title: "虧兎に告ぐ", romaji: "A message to the fainting rabbit", artist: "あさき", diffs: [5.60, 6.65, 7.60, null], vid: "xX3AYfzS47E", tags: [] },
+  { n: 2,  title: "怪獣の花唄", romaji: "Monster Flower Song", artist: "Vaundy", diffs: [1.90, 3.20, 4.70, 7.10], vid: "yD96dG2kPZk", tags: [] },
+  { n: 3,  title: "Arcadia", artist: "Maro feat. 藤城リエ — GW original, 190 BPM", diffs: [3.20, 5.00, 5.90, 8.40], vid: null, tags: [] },
+  { n: 4,  title: "Agnus Dei", artist: "あさき", diffs: [5.25, 6.35, 8.15, 8.90], vid: "ZPiYEl0fzBA", note: "DrumMania 9thMix", tags: [] },
+  { n: 5,  title: "Die Zauberflöte", artist: "CLASSIC version", diffs: [6.00, 7.40, 8.50, null], vid: "M-bw-MLoK7Q", note: "GF V / DM V — MASTER", tags: ["classic"] },
+  { n: 6,  title: "Dreamer's High", artist: "DAIHEI — Tri-Boost Re:EVOLVE, 139 BPM", diffs: [2.10, 4.20, 5.95, 7.30], vid: null, tags: [] },
+  { n: 7,  title: "Gently, the rain sings for me", artist: "HOLSTEIN", diffs: [4.15, 5.40, 7.00, null], vid: "j61Q6IZYcRI", note: "EXTREME — BASIC", tags: [] },
+  { n: 8,  title: "GHOST", artist: "星街すいせい (Hoshimachi Suisei)", diffs: [2.20, 4.00, 6.00, 8.80], vid: "r_nhN_DEBUs", note: "MASTER — BASIC", tags: [] },
+  { n: 9,  title: "going up", artist: "colors (Taka) — GF V & DM V, 212 BPM", diffs: [3.45, 5.50, 8.40, null], vid: null, tags: [] },
+  { n: 10, title: "HANABI", artist: "colors / koyomi", diffs: [3.55, 5.40, 7.10, 8.45], vid: "JnAUHL1SXZg", note: "Master drum", tags: [] },
+  { n: 11, title: "KING", artist: "Kanaria", diffs: [1.80, 2.80, 5.30, 8.70], vid: "7kLvIg-2Nbk", note: "Master drum", tags: [] },
+  { n: 12, title: "MAD BLAST", artist: "THE INFECTION", diffs: [5.50, 6.90, 8.30, 8.90], vid: "7CL9Uc2AH9M", note: "EXT — BASIC", alts: [{ vid: "YkUVutzdCJc", label: "Master FC" }], tags: [] },
+  { n: 13, title: "New Order", artist: "Maro feat. 満手るか", diffs: [1.80, 3.20, 5.80, 8.45], vid: "nsFMJViaL0w", note: "MASTER — BASIC", alts: [{ vid: "6chExKu5gZU", label: "SS FC" }], tags: [] },
+  { n: 14, title: "over there", artist: "Hideyuki Ono (vox) — GF V2 & DM V2", diffs: [6.60, 7.95, 9.71, null], vid: "9nDxucDNF9k", note: "DM V2 EXT autoplay", alts: [{ vid: "PT1AsPNLKDg", label: "song" }], tags: ["classic"] },
+  { n: 15, title: "R#1", artist: "colors (TAKA, drums Yasuo Sano) — GF V4 & DM V4, 248 BPM", diffs: [4.40, 5.45, 6.90, null], vid: null, tags: [] },
+  { n: 16, title: "REVOLUTION (RЁVOLUTIΦN)", artist: "TЁЯRA — GF V4 & DM V4, 202 BPM", diffs: [4.40, 6.10, 7.80, null], vid: "y6DN5yU65Kg", note: "GITADORA BGA", alts: [{ vid: "QcVSX0o1BmU", label: "V4 guitar EXT" }], tags: [] },
+  { n: 17, title: "Rewrite", artist: "ASIAN KUNG-FU GENERATION", diffs: [2.60, 3.80, 6.90, 8.65], vid: "5a4VGFag7kA", note: "MASTER — BASIC", alts: [{ vid: "X4DFUBL2TfE", label: "SS FC" }], tags: [] },
+  { n: 18, title: "Venus", artist: "Tatsh + RayZY — GF V3 & DM V3, 195 BPM", diffs: [4.15, 5.55, 6.50, null], vid: "4AwHLxuSt7Q", note: "song (HQ audio)", alts: [{ vid: "jZ20ruN4YAA", label: "DDR SN2 BGA" }], tags: [] },
+  { n: 19, title: "青と夏", romaji: "Ao to Natsu", artist: "Mrs. GREEN APPLE — added 2025-11-06", diffs: [1.80, 3.30, 5.00, 6.80], vid: "m34DPnRUfMU", note: "Official MV (DM gameplay TBD)", alts: [{ vid: "hLFWeqkZu7E", label: "drum cover w/ tab" }], tags: [] },
+  { n: 20, title: "アルストロメリア", romaji: "Alstroemeria (GITADORA Ver.)", artist: "TAG", diffs: [3.00, 5.70, 8.55, null], vid: "3oHFyCjiCuI", note: "EXTREME (drum)", alts: [{ vid: "iQNOJGoE99U", label: "alt EXTREME" }], tags: [] },
+  { n: 21, title: "色ハニホヘト散リヌルヲ", artist: "小寺可南子", diffs: [2.05, 3.60, 5.80, 6.90], vid: "FZfYltQuVuA", note: "Master drum", tags: [] },
+  { n: 22, title: "鬼姫 (CLASSIC)", romaji: "Onihime", artist: "鬼の子合唱団 (Asaki)", diffs: [6.60, 8.35, 9.30, null], vid: "4F637Zd9fzQ", note: "MASTER — BASIC", alts: [{ vid: "c8r_O_6mcDw", label: "XG3 FC SS" }], tags: ["classic"] },
+  { n: 23, title: "朧", romaji: "Oboro", artist: "GITADOROCK by 大和", diffs: [1.30, 3.40, 6.35, 8.90], vid: "qZcPq5mN0r4", note: "MASTER — BASIC", tags: [] },
+  { n: 24, title: "かくれんぼ", romaji: "Kakurenbo", artist: "AliA", diffs: [1.90, 3.80, 5.20, 7.30], vid: "EBIo8IFV1Ec", note: "Direct capture MAS — GW DELTA", tags: [] },
+  { n: 25, title: "君と同じ季節の下", artist: "鈴木友里絵 — distributed Mar 2013", diffs: [2.40, 5.20, 6.90, null], vid: "mstdmRxVnEk", note: "D ADV / EXT", tags: [] },
+  { n: 26, title: "極東史記 (CLASSIC)", romaji: "Kyokuto Shiki", artist: "あさき", diffs: [4.85, 6.30, 7.20, null], vid: "QvhdOwTgpt8", note: "EXTREME — BASIC", alts: [{ vid: "exr9-EMVhzE", label: "BGA" }], tags: ["classic"] },
+  { n: 27, title: "月光蝶", romaji: "Gekkouchou", artist: "あさき", diffs: [4.65, 6.40, 7.30, null], vid: "f-TIrTg_iFM", note: "EXTREME — BASIC", tags: [] },
+  { n: 28, title: "恋は臆病 (CLASSIC)", artist: "達見 恵", diffs: [4.00, 6.10, 7.40, null], vid: "EoKmVcpYZvM", note: "CLASSIC EXT — BASIC", alts: [{ vid: "QoW3Uth1k_s", label: "original" }], tags: ["classic"] },
+  { n: 29, title: "ゴーイング マイ ウェイ！", artist: "達見恵 feat. 佐野宏晃", diffs: [3.00, 4.95, 7.20, 7.90], vid: "Jw6AYeuqoeg", note: "MASTER — BASIC", tags: [] },
+  { n: 30, title: "紅焔", romaji: "Kouen", artist: "PON — GF XG3 & DM XG3, 175 BPM", diffs: [3.05, 6.20, 8.30, null], vid: "0a_0Ggi7hBs", note: "EXTREME — BASIC", tags: [] },
+  { n: 31, title: "この子の七つのお祝いに", artist: "DrumMania 9thMix", diffs: [6.45, 7.55, 8.65, null], vid: "gw5gwJXB5XE", note: "9thMix EXT autoplay", tags: [] },
+  { n: 32, title: "幸せのかたち", artist: "あさき", diffs: [2.80, 5.40, 7.00, null], vid: "gX3zXZqC-FQ", note: "EXTREME — BASIC", tags: [] },
+  { n: 33, title: "シューティンスター★☆", romaji: "Shooting Star (GITADORA ver.)", artist: "ReGLOSS", diffs: [2.90, 4.20, 5.90, 7.40], vid: "Yb-I_TfIhYo", note: "MASTER — BASIC", alts: [{ vid: "VtGtyQWd0s4", label: "MAS-G Excellent" }], tags: [] },
+  { n: 34, title: "空色デイズ", romaji: "Sorairo Days", artist: "—", diffs: [1.30, 3.20, 5.40, 7.20], vid: "DYyisVeyZf8", note: "MASTER — BASIC", tags: [] },
+  { n: 35, title: "つぼみ", artist: "—", diffs: [2.25, 5.05, 8.45, null], vid: null, tags: [] },
+  { n: 36, title: "ツミナガラ... と彼女は謂ふ", artist: "あさき", diffs: [6.45, 7.55, 8.45, null], vid: "merwCxFhkYI", note: "-再- MASTER — BASIC", alts: [{ vid: "GMGwZA6EH74", label: "original EXT" }], tags: [] },
+  { n: 37, title: "晴る", romaji: "Haru", artist: "ヨルシカ (Yorushika)", diffs: [1.90, 2.90, 5.00, 6.10], vid: "dbVfQkJgEVU", note: "MASTER — BASIC", alts: [{ vid: "3l4_QfnpN0Q", label: "direct MAS" }], tags: [] },
+  { n: 38, title: "ヒマワリ", romaji: "Himawari", artist: "BeForU (Riyu)", diffs: [4.25, 6.10, 7.45, null], vid: "9TstwtEZSDo", note: "EXTREME — BASIC", tags: [] },
+  { n: 39, title: "ほしふり (CLASSIC)", romaji: "Hoshifuri", artist: "Sana", diffs: [2.70, 5.65, 6.75, null], vid: "cDp-9AquL1I", note: "EXTREME — BASIC", tags: ["classic"] },
+  { n: 40, title: "雷鳴", romaji: "Raimei", artist: "SARAH feat. 桿子 Drumstick", diffs: [2.90, 4.65, 7.05, 7.75], vid: "Yq3hhpv-rK0", note: "NEX+AGE MASTER — BASIC", alts: [{ vid: "alhS_aAqf98", label: "MAS FC 99.95%" }], tags: [] },
+  { n: 41, title: "雷君", romaji: "Raikun", artist: "PON", diffs: [3.35, 4.95, 8.75, null], vid: "Xrh-LKdG3s0", note: "EXTREME — BASIC", tags: [] },
+];
+
+const DIFF_LABELS = ["B", "A", "E", "M"];
+const DIFF_CLASSES = ["b", "a", "e", "m"];
+
+const playSvg = `<svg viewBox="0 0 68 48"><path d="M66.52 7.74c-.78-2.93-2.49-5.41-5.42-6.19C55.79.13 34 0 34 0S12.21.13 6.9 1.55c-2.93.78-4.64 3.26-5.42 6.19C.06 13.05 0 24 0 24s.06 10.95 1.48 16.26c.78 2.93 2.49 5.41 5.42 6.19C12.21 47.87 34 48 34 48s21.79-.13 27.1-1.55c2.93-.78 4.64-3.26 5.42-6.19C67.94 34.95 68 24 68 24s-.06-10.95-1.48-16.26z" fill="#FF0000"/><path d="M45 24L27 14v20z" fill="#fff"/></svg>`;
+
+function makeSearchUrl(song) {
+  const q = encodeURIComponent(`${song.title} gitadora drummania master`);
+  return `https://www.youtube.com/results?search_query=${q}`;
+}
+
+function diffBlock(diffs) {
+  return diffs.map((v, i) => {
+    const cls = v == null ? "na" : DIFF_CLASSES[i];
+    const val = v == null ? "—" : v.toFixed(2);
+    return `<div class="diff ${cls}"><span class="lbl">${DIFF_LABELS[i]}</span><span class="val">${val}</span></div>`;
+  }).join("");
+}
+
+function cardHtml(s) {
+  const videoBlock = s.vid
+    ? `<div class="video-wrap" data-vid="${s.vid}">
+         <img loading="lazy" src="https://i.ytimg.com/vi/${s.vid}/mqdefault.jpg" alt="">
+         <div class="play-btn">${playSvg}</div>
+         <a class="yt-open" href="https://www.youtube.com/watch?v=${s.vid}" target="_blank" onclick="event.stopPropagation()">Open ↗</a>
+       </div>`
+    : `<div class="no-video">
+         <div class="label">No DM gameplay video</div>
+         <div>browse the reference channels or</div>
+         <a href="${makeSearchUrl(s)}" target="_blank">search YouTube ↗</a>
+       </div>`;
+
+  const altsHtml = (s.alts && s.alts.length)
+    ? `<div class="alts">${s.alts.map(a => `<a href="#" data-vid="${a.vid}" class="alt-link">▸ ${a.label}</a>`).join("")}</div>`
+    : "";
+
+  const noteLine = s.note ? `<div style="font-size:11px;color:var(--text-faint);">${s.note}</div>` : "";
+  const romaji = s.romaji ? ` <span style="color:var(--text-faint);font-weight:400;font-size:13px;">· ${s.romaji}</span>` : "";
+
+  return `<article class="card" data-search="${(s.title + " " + (s.romaji||"") + " " + (s.artist||"")).toLowerCase()}" data-has-video="${!!s.vid}" data-tags="${(s.tags||[]).join(",")}">
+    ${videoBlock}
+    <div class="meta">
+      <span class="num-tag">#${String(s.n).padStart(2,"0")}</span>
+      <h3 class="title">${s.title}${romaji}</h3>
+      <div class="artist">${s.artist || ""}</div>
+      ${noteLine}
+      <div class="diffs">${diffBlock(s.diffs)}</div>
+      ${altsHtml}
+    </div>
+  </article>`;
+}
+
+const grid = document.getElementById("grid");
+grid.innerHTML = SONGS.map(cardHtml).join("");
+
+// Click thumbnail → swap to iframe
+grid.addEventListener("click", (e) => {
+  const wrap = e.target.closest(".video-wrap");
+  const altLink = e.target.closest(".alt-link");
+
+  // Click thumbnail → open on YouTube directly in new tab.
+  // (Most rhythm-game uploaders disable embedding — Error 153 — so iframes are unreliable.)
+  if (altLink) {
+    e.preventDefault();
+    window.open(`https://www.youtube.com/watch?v=${altLink.dataset.vid}`, "_blank");
+    return;
+  }
+
+  if (wrap && wrap.dataset.vid) {
+    window.open(`https://www.youtube.com/watch?v=${wrap.dataset.vid}`, "_blank");
+  }
+});
+
+// Search + filter
+const search = document.getElementById("search");
+const count = document.getElementById("count");
+const chips = document.querySelectorAll(".chip");
+let activeFilter = "all";
+
+function applyFilters() {
+  const q = search.value.trim().toLowerCase();
+  let visible = 0;
+  document.querySelectorAll(".card").forEach((card) => {
+    const matchesSearch = !q || card.dataset.search.includes(q);
+    const hasVideo = card.dataset.hasVideo === "true";
+    const tags = card.dataset.tags.split(",");
+    let matchesFilter = true;
+    if (activeFilter === "video") matchesFilter = hasVideo;
+    else if (activeFilter === "no-video") matchesFilter = !hasVideo;
+    else if (activeFilter === "classic") matchesFilter = tags.includes("classic");
+    const show = matchesSearch && matchesFilter;
+    card.classList.toggle("hidden", !show);
+    if (show) visible++;
+  });
+  count.textContent = `${visible} song${visible === 1 ? "" : "s"}`;
+}
+
+search.addEventListener("input", applyFilters);
+chips.forEach((chip) => {
+  chip.addEventListener("click", () => {
+    chips.forEach(c => c.classList.remove("active"));
+    chip.classList.add("active");
+    activeFilter = chip.dataset.filter;
+    applyFilters();
+  });
+});
+</script>
+
+</body>
+</html>
