@@ -356,6 +356,76 @@
   .diff.m { color: var(--master); }
   .diff.na { color: var(--na); }
 
+  /* clear-toggle */
+  .diff[data-clear-key] { cursor: pointer; transition: all 0.15s; position: relative; }
+  .diff[data-clear-key]:hover { background: rgba(255,255,255,0.09); transform: translateY(-1px); }
+  .diff.cleared {
+    background: rgba(34,197,94,0.16) !important;
+    border-color: rgba(34,197,94,0.45) !important;
+    box-shadow: inset 0 0 0 1px rgba(34,197,94,0.2);
+  }
+  .diff.cleared::after {
+    content: "✓";
+    position: absolute;
+    top: 1px;
+    right: 5px;
+    font-size: 9px;
+    color: rgba(74,222,128,0.95);
+    font-weight: 700;
+  }
+
+  /* star (setlist pin) */
+  .star-btn {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    width: 30px;
+    height: 30px;
+    background: rgba(0,0,0,0.6);
+    border: 1px solid rgba(255,255,255,0.14);
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255,255,255,0.55);
+    font-size: 14px;
+    z-index: 3;
+    backdrop-filter: blur(6px);
+    transition: all 0.2s;
+    line-height: 1;
+    padding: 0;
+    font-family: inherit;
+  }
+  .star-btn:hover { color: #FFD54F; border-color: rgba(255,213,79,0.55); transform: scale(1.05); }
+  .card.starred .star-btn {
+    color: #FFD54F;
+    background: rgba(255,213,79,0.22);
+    border-color: rgba(255,213,79,0.7);
+    box-shadow: 0 0 14px rgba(255,213,79,0.35);
+  }
+
+  /* progress stats row */
+  .progress-stats {
+    display: flex;
+    gap: 18px;
+    width: 100%;
+    margin-top: 6px;
+    font-size: 12px;
+    color: var(--text-faint);
+    flex-wrap: wrap;
+  }
+  .progress-stats span {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .progress-stats b {
+    color: var(--text);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+
   .alts {
     display: flex;
     gap: 8px;
@@ -404,6 +474,11 @@
     <div class="stat"><span class="label">All Songs</span><span class="value" id="val-all-skill">3219.22</span></div>
     <div class="stat"><span class="label">Songs</span><span class="value" id="val-count">46/50</span></div>
   </div>
+  <div class="progress-stats">
+    <span>★ <b id="val-pinned">0</b> pinned</span>
+    <span>✓ <b id="val-cleared-mas">0</b> MAS cleared</span>
+    <span>🎯 <b id="val-uncleared-mas">0</b> MAS to clear</span>
+  </div>
   <div class="hero-links">
     <div class="mode-toggle" id="mode-toggle">
       <button data-mode="dm" class="active">🥁 DrumMania</button>
@@ -422,6 +497,8 @@
   <span class="chip" data-filter="video">Has video</span>
   <span class="chip" data-filter="no-video">No video</span>
   <span class="chip" data-filter="classic">CLASSIC</span>
+  <span class="chip" data-filter="setlist">★ Setlist</span>
+  <span class="chip" data-filter="uncleared-mas">🎯 Uncleared MAS</span>
   <span class="count" id="count">41 songs</span>
 </div>
 
@@ -516,6 +593,19 @@ const DIFF_CLASSES = ["b", "a", "e", "m"];
 const playSvg = `<svg viewBox="0 0 68 48"><path d="M66.52 7.74c-.78-2.93-2.49-5.41-5.42-6.19C55.79.13 34 0 34 0S12.21.13 6.9 1.55c-2.93.78-4.64 3.26-5.42 6.19C.06 13.05 0 24 0 24s.06 10.95 1.48 16.26c.78 2.93 2.49 5.41 5.42 6.19C12.21 47.87 34 48 34 48s21.79-.13 27.1-1.55c2.93-.78 4.64-3.26 5.42-6.19C67.94 34.95 68 24 68 24s-.06-10.95-1.48-16.26z" fill="#FF0000"/><path d="M45 24L27 14v20z" fill="#fff"/></svg>`;
 
 function songMode(s) { return s.mode || "dm"; }
+function songKey(s) { return `${songMode(s)}:${s.n}`; }
+function diffKey(s, i) { return `${songMode(s)}:${s.n}:${i}`; }
+
+// Persistent state: cleared diffs + setlist pins (localStorage)
+const STORAGE_KEY = "gitadora-v1";
+const state = { cleared: {}, setlist: {} };
+try {
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if (raw) Object.assign(state, JSON.parse(raw));
+} catch (e) { /* ignore */ }
+function saveState() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
+}
 
 function makeSearchUrl(song) {
   const inst = songMode(song) === "gf" ? "guitarfreaks" : "drummania";
@@ -523,11 +613,15 @@ function makeSearchUrl(song) {
   return `https://www.youtube.com/results?search_query=${q}`;
 }
 
-function diffBlock(diffs) {
-  return diffs.map((v, i) => {
+function diffBlock(s) {
+  return s.diffs.map((v, i) => {
     const cls = v == null ? "na" : DIFF_CLASSES[i];
     const val = v == null ? "—" : v.toFixed(2);
-    return `<div class="diff ${cls}"><span class="lbl">${DIFF_LABELS[i]}</span><span class="val">${val}</span></div>`;
+    const key = diffKey(s, i);
+    const isCleared = v != null && state.cleared[key];
+    const clrCls = isCleared ? " cleared" : "";
+    const dataAttr = v != null ? ` data-clear-key="${key}"` : "";
+    return `<div class="diff ${cls}${clrCls}"${dataAttr}><span class="lbl">${DIFF_LABELS[i]}</span><span class="val">${val}</span></div>`;
   }).join("");
 }
 
@@ -551,14 +645,18 @@ function cardHtml(s) {
   const noteLine = s.note ? `<div style="font-size:11px;color:var(--text-faint);">${s.note}</div>` : "";
   const romaji = s.romaji ? ` <span style="color:var(--text-faint);font-weight:400;font-size:13px;">· ${s.romaji}</span>` : "";
 
-  return `<article class="card" data-mode="${songMode(s)}" data-search="${(s.title + " " + (s.romaji||"") + " " + (s.artist||"")).toLowerCase()}" data-has-video="${!!s.vid}" data-tags="${(s.tags||[]).join(",")}">
+  const key = songKey(s);
+  const starred = state.setlist[key] ? " starred" : "";
+  const hasMas = s.diffs[3] != null;
+  return `<article class="card${starred}" data-mode="${songMode(s)}" data-song-key="${key}" data-has-mas="${hasMas}" data-search="${(s.title + " " + (s.romaji||"") + " " + (s.artist||"")).toLowerCase()}" data-has-video="${!!s.vid}" data-tags="${(s.tags||[]).join(",")}">
+    <button class="star-btn" title="Pin to setlist" type="button">★</button>
     ${videoBlock}
     <div class="meta">
       <span class="num-tag">#${String(s.n).padStart(2,"0")}</span>
       <h3 class="title">${s.title}${romaji}</h3>
       <div class="artist">${s.artist || ""}</div>
       ${noteLine}
-      <div class="diffs">${diffBlock(s.diffs)}</div>
+      <div class="diffs">${diffBlock(s)}</div>
       ${altsHtml}
     </div>
   </article>`;
@@ -567,10 +665,33 @@ function cardHtml(s) {
 const grid = document.getElementById("grid");
 grid.innerHTML = SONGS.map(cardHtml).join("");
 
-// Click thumbnail → swap to iframe
+// Click thumbnail → swap to iframe (+ star toggle + diff clear toggle)
 grid.addEventListener("click", (e) => {
   const wrap = e.target.closest(".video-wrap");
   const altLink = e.target.closest(".alt-link");
+  const starBtn = e.target.closest(".star-btn");
+  const diffCell = e.target.closest(".diff[data-clear-key]");
+
+  if (starBtn) {
+    e.stopPropagation();
+    const card = starBtn.closest(".card");
+    const k = card.dataset.songKey;
+    if (state.setlist[k]) delete state.setlist[k]; else state.setlist[k] = true;
+    card.classList.toggle("starred", !!state.setlist[k]);
+    saveState();
+    updateProgress();
+    return;
+  }
+
+  if (diffCell) {
+    e.stopPropagation();
+    const k = diffCell.dataset.clearKey;
+    if (state.cleared[k]) delete state.cleared[k]; else state.cleared[k] = true;
+    diffCell.classList.toggle("cleared", !!state.cleared[k]);
+    saveState();
+    updateProgress();
+    return;
+  }
 
   // Click thumbnail → swap to inline iframe player (youtube-nocookie for broader embed support).
   // If a video is uploader-blocked (Error 153), the "Open ↗" badge in the top-right
@@ -648,16 +769,38 @@ function applyFilters() {
     const matchesSearch = !q || card.dataset.search.includes(q);
     const hasVideo = card.dataset.hasVideo === "true";
     const tags = card.dataset.tags.split(",");
+    const songK = card.dataset.songKey;
     let matchesFilter = true;
     if (activeFilter === "video") matchesFilter = hasVideo;
     else if (activeFilter === "no-video") matchesFilter = !hasVideo;
     else if (activeFilter === "classic") matchesFilter = tags.includes("classic");
+    else if (activeFilter === "setlist") matchesFilter = !!state.setlist[songK];
+    else if (activeFilter === "uncleared-mas") {
+      const hasMas = card.dataset.hasMas === "true";
+      const masCleared = state.cleared[`${songK}:3`];
+      matchesFilter = hasMas && !masCleared;
+    }
     const show = inMode && matchesSearch && matchesFilter;
     card.classList.toggle("hidden", !show);
     if (show) visible++;
   });
   count.textContent = `${visible} song${visible === 1 ? "" : "s"}`;
   document.getElementById("val-count").textContent = `${modeTotal}/50`;
+}
+
+function updateProgress() {
+  let pinned = 0, masCleared = 0, masToClear = 0;
+  SONGS.forEach(s => {
+    if (songMode(s) !== activeMode) return;
+    if (state.setlist[songKey(s)]) pinned++;
+    if (s.diffs[3] != null) {
+      if (state.cleared[diffKey(s, 3)]) masCleared++;
+      else masToClear++;
+    }
+  });
+  document.getElementById("val-pinned").textContent = pinned;
+  document.getElementById("val-cleared-mas").textContent = masCleared;
+  document.getElementById("val-uncleared-mas").textContent = masToClear;
 }
 
 search.addEventListener("input", applyFilters);
@@ -675,11 +818,13 @@ document.querySelectorAll("#mode-toggle button").forEach((btn) => {
     activeMode = btn.dataset.mode;
     applyMode();
     applyFilters();
+    updateProgress();
   });
 });
 
 applyMode();
 applyFilters();
+updateProgress();
 </script>
 
 </body>
