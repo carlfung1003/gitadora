@@ -192,6 +192,96 @@
   }
   .count { color: var(--text-faint); font-size: 13px; margin-left: auto; }
 
+  /* Sort + range row */
+  .controls-2 {
+    max-width: 1400px;
+    margin: 0 auto 24px;
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    align-items: center;
+    font-size: 13px;
+    color: var(--text-dim);
+  }
+  .ctrl-group {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 6px 12px;
+  }
+  .ctrl-group label { color: var(--text-faint); font-size: 12px; letter-spacing: 0.3px; }
+  .ctrl-group select, .ctrl-group input[type="number"] {
+    background: transparent;
+    color: var(--text);
+    border: none;
+    font-size: 13px;
+    font-family: inherit;
+    padding: 2px 4px;
+    outline: none;
+  }
+  .ctrl-group input[type="number"] {
+    width: 56px;
+    background: rgba(0,0,0,0.25);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 6px;
+    padding: 4px 6px;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+  }
+  .ctrl-group input[type="number"]:focus { border-color: var(--accent); }
+  .ctrl-group select option { background: var(--bg-2); color: var(--text); }
+  .ctrl-reset {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-faint);
+    border-radius: 999px;
+    padding: 7px 12px;
+    cursor: pointer;
+    font-size: 12px;
+    font-family: inherit;
+  }
+  .ctrl-reset:hover { color: var(--text); border-color: var(--border-hover); }
+
+  /* Notes block */
+  .notes-block {
+    margin-top: 4px;
+    padding-top: 8px;
+    border-top: 1px dashed rgba(255,255,255,0.07);
+    font-size: 12px;
+  }
+  .notes-empty {
+    color: var(--text-faint);
+    cursor: pointer;
+    font-size: 11px;
+    opacity: 0.7;
+    transition: opacity 0.15s;
+  }
+  .notes-empty:hover { opacity: 1; color: var(--accent-2); }
+  .notes-text {
+    color: var(--text-dim);
+    cursor: text;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 4px 0;
+    line-height: 1.45;
+  }
+  .notes-edit {
+    width: 100%;
+    background: rgba(0,0,0,0.3);
+    color: var(--text);
+    border: 1px solid var(--accent);
+    border-radius: 6px;
+    padding: 8px 10px;
+    font-size: 12px;
+    font-family: inherit;
+    resize: vertical;
+    min-height: 50px;
+    outline: none;
+  }
+
   /* GRID */
   .grid {
     max-width: 1400px;
@@ -502,6 +592,27 @@
   <span class="count" id="count">41 songs</span>
 </div>
 
+<div class="controls-2">
+  <div class="ctrl-group">
+    <label>Sort</label>
+    <select id="sort-by">
+      <option value="default">Favorites order (#)</option>
+      <option value="mas-desc">MAS — hardest first</option>
+      <option value="mas-asc">MAS — easiest first</option>
+      <option value="ext-desc">EXT — hardest first</option>
+      <option value="ext-asc">EXT — easiest first</option>
+      <option value="title">Title (A→Z)</option>
+    </select>
+  </div>
+  <div class="ctrl-group">
+    <label>MAS range</label>
+    <input type="number" id="range-min" placeholder="min" step="0.05" min="0" max="10" />
+    <span style="color: var(--text-faint);">—</span>
+    <input type="number" id="range-max" placeholder="max" step="0.05" min="0" max="10" />
+  </div>
+  <button class="ctrl-reset" id="ctrl-reset" type="button">Reset sort/range</button>
+</div>
+
 <main class="grid" id="grid"></main>
 
 <footer>
@@ -598,13 +709,16 @@ function diffKey(s, i) { return `${songMode(s)}:${s.n}:${i}`; }
 
 // Persistent state: cleared diffs + setlist pins (localStorage)
 const STORAGE_KEY = "gitadora-v1";
-const state = { cleared: {}, setlist: {} };
+const state = { cleared: {}, setlist: {}, notes: {} };
 try {
   const raw = localStorage.getItem(STORAGE_KEY);
   if (raw) Object.assign(state, JSON.parse(raw));
 } catch (e) { /* ignore */ }
 function saveState() {
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
+}
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[c]);
 }
 
 function makeSearchUrl(song) {
@@ -648,7 +762,16 @@ function cardHtml(s) {
   const key = songKey(s);
   const starred = state.setlist[key] ? " starred" : "";
   const hasMas = s.diffs[3] != null;
-  return `<article class="card${starred}" data-mode="${songMode(s)}" data-song-key="${key}" data-has-mas="${hasMas}" data-search="${(s.title + " " + (s.romaji||"") + " " + (s.artist||"")).toLowerCase()}" data-has-video="${!!s.vid}" data-tags="${(s.tags||[]).join(",")}">
+  const masV = s.diffs[3] == null ? -1 : s.diffs[3];
+  const extV = s.diffs[2] == null ? -1 : s.diffs[2];
+  const advV = s.diffs[1] == null ? -1 : s.diffs[1];
+  const basV = s.diffs[0] == null ? -1 : s.diffs[0];
+  const noteText = state.notes[key] || "";
+  const notesHtml = noteText
+    ? `<div class="notes-text" data-action="edit-note">📝 ${escapeHtml(noteText)}</div>`
+    : `<div class="notes-empty" data-action="edit-note">+ Add note</div>`;
+
+  return `<article class="card${starred}" data-mode="${songMode(s)}" data-song-key="${key}" data-has-mas="${hasMas}" data-n="${s.n}" data-mas="${masV}" data-ext="${extV}" data-adv="${advV}" data-bas="${basV}" data-title-key="${escapeHtml(s.title.toLowerCase())}" data-search="${(s.title + " " + (s.romaji||"") + " " + (s.artist||"")).toLowerCase()}" data-has-video="${!!s.vid}" data-tags="${(s.tags||[]).join(",")}">
     <button class="star-btn" title="Pin to setlist" type="button">★</button>
     ${videoBlock}
     <div class="meta">
@@ -658,6 +781,7 @@ function cardHtml(s) {
       ${noteLine}
       <div class="diffs">${diffBlock(s)}</div>
       ${altsHtml}
+      <div class="notes-block">${notesHtml}</div>
     </div>
   </article>`;
 }
@@ -690,6 +814,28 @@ grid.addEventListener("click", (e) => {
     diffCell.classList.toggle("cleared", !!state.cleared[k]);
     saveState();
     updateProgress();
+    return;
+  }
+
+  const noteTrigger = e.target.closest('[data-action="edit-note"]');
+  if (noteTrigger) {
+    e.stopPropagation();
+    const card = noteTrigger.closest(".card");
+    const k = card.dataset.songKey;
+    const current = state.notes[k] || "";
+    const block = card.querySelector(".notes-block");
+    block.innerHTML = `<textarea class="notes-edit" placeholder="Notes (saves on blur)">${escapeHtml(current)}</textarea>`;
+    const ta = block.querySelector("textarea");
+    ta.focus();
+    ta.setSelectionRange(ta.value.length, ta.value.length);
+    ta.addEventListener("blur", () => {
+      const val = ta.value.trim();
+      if (val) state.notes[k] = val; else delete state.notes[k];
+      saveState();
+      block.innerHTML = val
+        ? `<div class="notes-text" data-action="edit-note">📝 ${escapeHtml(val)}</div>`
+        : `<div class="notes-empty" data-action="edit-note">+ Add note</div>`;
+    });
     return;
   }
 
@@ -761,6 +907,9 @@ function applyMode() {
 
 function applyFilters() {
   const q = search.value.trim().toLowerCase();
+  const rMin = parseFloat(document.getElementById("range-min").value);
+  const rMax = parseFloat(document.getElementById("range-max").value);
+  const rangeActive = !isNaN(rMin) || !isNaN(rMax);
   let visible = 0;
   let modeTotal = 0;
   document.querySelectorAll(".card").forEach((card) => {
@@ -780,12 +929,52 @@ function applyFilters() {
       const masCleared = state.cleared[`${songK}:3`];
       matchesFilter = hasMas && !masCleared;
     }
-    const show = inMode && matchesSearch && matchesFilter;
+    let matchesRange = true;
+    if (rangeActive) {
+      const mas = parseFloat(card.dataset.mas);
+      if (mas < 0) matchesRange = false;
+      else {
+        if (!isNaN(rMin) && mas < rMin) matchesRange = false;
+        if (!isNaN(rMax) && mas > rMax) matchesRange = false;
+      }
+    }
+    const show = inMode && matchesSearch && matchesFilter && matchesRange;
     card.classList.toggle("hidden", !show);
     if (show) visible++;
   });
   count.textContent = `${visible} song${visible === 1 ? "" : "s"}`;
   document.getElementById("val-count").textContent = `${modeTotal}/50`;
+}
+
+function applySort() {
+  const sortBy = document.getElementById("sort-by").value;
+  if (sortBy === "default") {
+    // restore by original n within mode
+    const cards = Array.from(document.querySelectorAll(".card"));
+    cards.sort((a, b) => {
+      if (a.dataset.mode !== b.dataset.mode) return a.dataset.mode === "dm" ? -1 : 1;
+      return parseInt(a.dataset.n) - parseInt(b.dataset.n);
+    });
+    cards.forEach(c => grid.appendChild(c));
+    return;
+  }
+  const cards = Array.from(document.querySelectorAll(".card"));
+  const dir = sortBy.endsWith("-desc") ? -1 : 1;
+  const field = sortBy === "title" ? "title-key" : sortBy.startsWith("mas") ? "mas" : "ext";
+  cards.sort((a, b) => {
+    if (a.dataset.mode !== b.dataset.mode) return a.dataset.mode === "dm" ? -1 : 1;
+    if (field === "title-key") {
+      return a.dataset.titleKey.localeCompare(b.dataset.titleKey) * dir;
+    }
+    const av = parseFloat(a.dataset[field]);
+    const bv = parseFloat(b.dataset[field]);
+    // Songs without value (-1) always sink to the bottom regardless of dir
+    if (av < 0 && bv < 0) return 0;
+    if (av < 0) return 1;
+    if (bv < 0) return -1;
+    return (av - bv) * dir;
+  });
+  cards.forEach(c => grid.appendChild(c));
 }
 
 function updateProgress() {
@@ -820,6 +1009,17 @@ document.querySelectorAll("#mode-toggle button").forEach((btn) => {
     applyFilters();
     updateProgress();
   });
+});
+
+document.getElementById("sort-by").addEventListener("change", applySort);
+document.getElementById("range-min").addEventListener("input", applyFilters);
+document.getElementById("range-max").addEventListener("input", applyFilters);
+document.getElementById("ctrl-reset").addEventListener("click", () => {
+  document.getElementById("sort-by").value = "default";
+  document.getElementById("range-min").value = "";
+  document.getElementById("range-max").value = "";
+  applySort();
+  applyFilters();
 });
 
 applyMode();
