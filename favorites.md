@@ -1,7 +1,7 @@
 # Gitadora Favorites — DrumMania Gameplay Tracker
 
 **Player:** CarlMeMayb · **ID:** J02CDF61A9 · **Card:** E47FT37UJS52WX2T
-**Title:** Cats and Cats · **DM Skill:** 2822.32 · **All Songs DM Skill:** 3219.22
+**Title:** Cats and Cats · **DM Skill:** 5020.96 · **All Songs DM Skill:** 5783.26
 **Game:** GITADORA GALAXY WAVE DELTA — Favorites Folder 1 (41/50)
 
 Difficulty columns: **B**asic / **A**dvanced / **E**xtreme / **M**aster.
