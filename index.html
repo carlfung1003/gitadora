@@ -548,6 +548,94 @@
 
   /* Hide on filter */
   .card.hidden { display: none; }
+
+  /* SKILL-TARGET PANEL */
+  .skill-panel {
+    max-width: 1400px;
+    margin: 0 auto 28px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: var(--card);
+    overflow: hidden;
+  }
+  .skill-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    padding: 14px 18px;
+    cursor: pointer;
+    user-select: none;
+    background: linear-gradient(90deg, rgba(192,132,252,0.10), rgba(34,211,238,0.06));
+  }
+  .skill-head h2 {
+    font-size: 15px;
+    font-weight: 700;
+    margin: 0;
+    background: linear-gradient(90deg, var(--accent) 0%, var(--accent-2) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .skill-head .caret { color: var(--text-faint); transition: transform 0.2s; font-size: 12px; }
+  .skill-panel.collapsed .caret { transform: rotate(-90deg); }
+  .skill-total { color: var(--text-dim); font-size: 13px; }
+  .skill-total b { color: var(--text); }
+  .skill-body { padding: 0 14px 16px; }
+  .skill-panel.collapsed .skill-body { display: none; }
+  .frame-toggle { display: flex; gap: 6px; margin: 12px 0 14px; }
+  .frame-toggle button {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    border-radius: 999px;
+    padding: 6px 16px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .frame-toggle button.active {
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    color: #0a0420;
+    border-color: transparent;
+  }
+  .frame-sub { color: var(--text-faint); font-size: 12px; margin-left: 6px; }
+  table.skill-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  table.skill-table th {
+    text-align: left;
+    color: var(--text-faint);
+    font-weight: 600;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    padding: 6px 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  table.skill-table th.num, table.skill-table td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  table.skill-table td {
+    padding: 8px 10px;
+    border-bottom: 1px solid rgba(160,100,255,0.08);
+  }
+  table.skill-table tr:hover td { background: var(--card-hover); }
+  .rank { color: var(--text-faint); font-variant-numeric: tabular-nums; width: 2ch; }
+  .st-title { color: var(--text); font-weight: 600; }
+  .st-pts { color: var(--accent); font-weight: 700; }
+  .chart-badge {
+    display: inline-block;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    padding: 1px 6px;
+    border-radius: 4px;
+    margin-left: 8px;
+    vertical-align: middle;
+  }
+  .chart-badge.master { background: #b026ff; color: #fff; }
+  .chart-badge.extreme { background: #ff2266; color: #fff; }
+  .skill-empty { color: var(--text-faint); font-size: 13px; padding: 18px 4px; }
+  @media (max-width: 640px) {
+    table.skill-table th.ach, table.skill-table td.ach { display: none; }
+  }
 </style>
 </head>
 <body>
@@ -580,6 +668,21 @@
     </a>
   </div>
 </header>
+
+<section class="skill-panel collapsed" id="skill-panel">
+  <div class="skill-head" id="skill-head">
+    <span class="caret">▾</span>
+    <h2>🎯 Skill-Target Songs</h2>
+    <span class="skill-total" id="skill-total"></span>
+  </div>
+  <div class="skill-body">
+    <div class="frame-toggle" id="frame-toggle">
+      <button data-frame="hot" class="active">🔥 HOT 枠 <span class="frame-sub" id="sub-hot"></span></button>
+      <button data-frame="other">OTHER <span class="frame-sub" id="sub-other"></span></button>
+    </div>
+    <div id="skill-table-wrap"></div>
+  </div>
+</section>
 
 <div class="controls">
   <input class="search" id="search" placeholder="Search song or artist…" />
@@ -893,9 +996,106 @@ const MODE_META = {
   },
 };
 
+// ====== DM Skill-Target Songs — HOT 枠 + OTHER (captured 2026-06-14) ======
+// Sum of every pts below == DM Skill 5020.96 (HOT 2581.93 + OTHER 2439.03).
+// c = chart used for the skill score (master / extreme). No duplicate songs.
+const SKILL_TARGETS = {
+  hot: [
+    { t: "Monster Flower Song", c: "master", pts: 126.08, ach: 88.79, dv: 7.10 },
+    { t: "GHOST", c: "master", pts: 124.57, ach: 70.78, dv: 8.80 },
+    { t: "The Weeping of the Lost One", c: "master", pts: 117.39, ach: 69.88, dv: 8.40 },
+    { t: "Hibana (Reloaded)", c: "master", pts: 116.48, ach: 75.64, dv: 7.70 },
+    { t: "Shades of Day", c: "master", pts: 115.63, ach: 68.83, dv: 8.40 },
+    { t: "Transparent Blue", c: "master", pts: 113.79, ach: 65.40, dv: 8.70 },
+    { t: "Ice Cream Magic", c: "master", pts: 112.62, ach: 76.10, dv: 7.40 },
+    { t: "Kyōran Kayo feat. shully", c: "master", pts: 110.68, ach: 68.75, dv: 8.05 },
+    { t: "Shooting Star (GITADORA ver.)", c: "master", pts: 109.89, ach: 66.20, dv: 8.30 },
+    { t: "Flame Barrier", c: "master", pts: 108.61, ach: 73.39, dv: 7.40 },
+    { t: "Ramen Messiah: Type A", c: "master", pts: 108.42, ach: 78.57, dv: 6.90 },
+    { t: "CHECKER FLAG", c: "master", pts: 107.72, ach: 69.95, dv: 7.70 },
+    { t: "ANEMONE -GITADORA EDITION-", c: "master", pts: 107.19, ach: 76.57, dv: 7.00 },
+    { t: "Rewrite", c: "master", pts: 107.03, ach: 61.87, dv: 8.65 },
+    { t: "Metal!! (feat. Tom Morello)", c: "master", pts: 104.01, ach: 71.24, dv: 7.30 },
+    { t: "Ryugin Unki Tora Fusei feat. Nana Takahashi / 709sec.", c: "master", pts: 103.33, ach: 66.24, dv: 7.80 },
+    { t: "Inferno", c: "master", pts: 103.08, ach: 75.80, dv: 6.80 },
+    { t: "Blue and Summer", c: "master", pts: 102.59, ach: 75.44, dv: 6.80 },
+    { t: "New Order", c: "master", pts: 102.54, ach: 60.68, dv: 8.45 },
+    { t: "Nike", c: "master", pts: 101.34, ach: 65.81, dv: 7.70 },
+    { t: "Tenjo Tenka Yuiga Doson", c: "master", pts: 97.20, ach: 66.58, dv: 7.30 },
+    { t: "Crimson and Azure Rampage (GITADORA ver.)", c: "master", pts: 95.36, ach: 58.87, dv: 8.10 },
+    { t: "Sunny", c: "master", pts: 94.83, ach: 77.73, dv: 6.10 },
+    { t: "hide and seek", c: "master", pts: 91.55, ach: 62.71, dv: 7.30 },
+  ],
+  other: [
+    { t: "going up", c: "extreme", pts: 122.30, ach: 72.80, dv: 8.40 },
+    { t: "REVOLUTION", c: "extreme", pts: 115.53, ach: 74.06, dv: 7.80 },
+    { t: "moonlight butterfly", c: "extreme", pts: 115.35, ach: 79.01, dv: 7.30 },
+    { t: "Die Zauberflote", c: "extreme", pts: 111.39, ach: 67.51, dv: 8.25 },
+    { t: "Onihime", c: "extreme", pts: 110.77, ach: 65.55, dv: 8.45 },
+    { t: "A message to the fainting rabbit", c: "extreme", pts: 110.39, ach: 72.63, dv: 7.60 },
+    { t: "Gently, the rain sings for me", c: "extreme", pts: 109.11, ach: 77.94, dv: 7.00 },
+    { t: "Concertino in Blue", c: "extreme", pts: 108.25, ach: 60.14, dv: 9.00 },
+    { t: "Guren", c: "extreme", pts: 106.60, ach: 72.52, dv: 7.35 },
+    { t: '"I\'m going to get hurt..." she said.', c: "extreme", pts: 106.11, ach: 62.79, dv: 8.45 },
+    { t: "bud", c: "extreme", pts: 105.16, ach: 62.23, dv: 8.45 },
+    { t: "Arcadia", c: "master", pts: 100.36, ach: 59.74, dv: 8.40 },
+    { t: "Blue Moon", c: "master", pts: 95.21, ach: 68.01, dv: 7.00 },
+    { t: "HANABI", c: "master", pts: 95.02, ach: 56.23, dv: 8.45 },
+    { t: "Just a sunny day for you", c: "master", pts: 93.14, ach: 73.34, dv: 6.35 },
+    { t: "Shooting Star ★☆", c: "master", pts: 92.60, ach: 62.57, dv: 7.40 },
+    { t: "The colors are scattered and scattered.", c: "master", pts: 88.15, ach: 63.88, dv: 6.90 },
+    { t: "Dreamer's High", c: "master", pts: 88.09, ach: 60.34, dv: 7.30 },
+    { t: "Clowing folly", c: "master", pts: 85.93, ach: 58.86, dv: 7.30 },
+    { t: "Sky Blue Days", c: "master", pts: 85.59, ach: 59.44, dv: 7.20 },
+    { t: "Under the same season as you", c: "extreme", pts: 81.30, ach: 58.92, dv: 6.90 },
+    { t: "The Shape of Happiness", c: "extreme", pts: 80.75, ach: 57.68, dv: 7.00 },
+    { t: "WONDER TRIP", c: "master", pts: 78.98, ach: 53.73, dv: 7.35 },
+    { t: "Beyond the light", c: "extreme", pts: 77.74, ach: 54.37, dv: 7.15 },
+    { t: "Records of the Far East", c: "extreme", pts: 75.21, ach: 51.52, dv: 7.30 },
+  ],
+};
+let activeFrame = "hot";
+const frameSum = (arr) => arr.reduce((a, s) => a + s.pts, 0);
+
+function renderSkillTable() {
+  const wrap = document.getElementById("skill-table-wrap");
+  if (activeMode !== "dm") {
+    wrap.innerHTML = `<div class="skill-empty">No GuitarFreaks skill-target data captured yet — switch to 🥁 DrumMania to view the breakdown.</div>`;
+    return;
+  }
+  const rows = SKILL_TARGETS[activeFrame];
+  const body = rows.map((s, i) => `
+    <tr>
+      <td class="rank num">${i + 1}</td>
+      <td><span class="st-title">${escapeHtml(s.t)}</span><span class="chart-badge ${s.c}">${s.c === "master" ? "MAS" : "EXT"}</span></td>
+      <td class="num st-pts">${s.pts.toFixed(2)}</td>
+      <td class="num ach">${s.ach.toFixed(2)}%</td>
+      <td class="num">${s.dv.toFixed(2)}</td>
+    </tr>`).join("");
+  wrap.innerHTML = `<table class="skill-table">
+    <thead><tr><th class="rank num">#</th><th>Musical score</th><th class="num">Skill pts</th><th class="num ach">Achievement</th><th class="num">Difficulty</th></tr></thead>
+    <tbody>${body}</tbody></table>`;
+}
+
+function updateSkillPanel() {
+  const hot = frameSum(SKILL_TARGETS.hot);
+  const other = frameSum(SKILL_TARGETS.other);
+  document.getElementById("sub-hot").textContent = `${SKILL_TARGETS.hot.length} · ${hot.toFixed(2)}`;
+  document.getElementById("sub-other").textContent = `${SKILL_TARGETS.other.length} · ${other.toFixed(2)}`;
+  const total = document.getElementById("skill-total");
+  if (activeMode === "dm") {
+    total.innerHTML = `DM · HOT <b>${hot.toFixed(2)}</b> + OTHER <b>${other.toFixed(2)}</b> = <b>${(hot + other).toFixed(2)}</b>`;
+  } else {
+    total.textContent = "GuitarFreaks — no skill-target data yet";
+  }
+  document.getElementById("frame-toggle").style.display = activeMode === "dm" ? "flex" : "none";
+  renderSkillTable();
+}
+
 function applyMode() {
   const m = MODE_META[activeMode];
   document.getElementById("mode-label").textContent = m.label;
+  updateSkillPanel();
   document.getElementById("lbl-skill").textContent = m.skillLabel;
   document.getElementById("val-skill").textContent = m.skill;
   document.getElementById("val-all-skill").textContent = m.allSkill;
@@ -1008,6 +1208,18 @@ document.querySelectorAll("#mode-toggle button").forEach((btn) => {
     applyMode();
     applyFilters();
     updateProgress();
+  });
+});
+
+// Skill-target panel: collapse toggle + HOT/OTHER frame switch
+document.getElementById("skill-head").addEventListener("click", () => {
+  document.getElementById("skill-panel").classList.toggle("collapsed");
+});
+document.querySelectorAll("#frame-toggle button").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    activeFrame = btn.dataset.frame;
+    document.querySelectorAll("#frame-toggle button").forEach(b => b.classList.toggle("active", b === btn));
+    renderSkillTable();
   });
 });
 

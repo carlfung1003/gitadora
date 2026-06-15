@@ -75,3 +75,66 @@ After a second pass, these have no DrumMania-specific gameplay video on YouTube.
 | 35 | つぼみ | No matching RemyWiki entry found — could be an obscure variant title |
 
 ### Verified direct DM gameplay videos: 36 / 41
+
+## Skill-Target Songs — DrumMania (captured 2026-06-14)
+
+These are the 49 charts that make up the **DM Skill 5020.96**, split into the in-game **HOT 枠** (recent-version songs) and **OTHER** frames. `c` = the chart scored. Sum of every row = HOT 2581.93 + OTHER 2439.03 = **5020.96** (verified, no duplicate songs — ANEMONE shows on both the bottom of one screenshot and the top of the next, but is counted once).
+
+### HOT 枠 — 24 songs · 2581.93
+
+| # | Song | Chart | Skill | Achv % | Diff |
+|---|------|-------|-------|--------|------|
+| 1 | Monster Flower Song | MAS | 126.08 | 88.79 | 7.10 |
+| 2 | GHOST | MAS | 124.57 | 70.78 | 8.80 |
+| 3 | The Weeping of the Lost One | MAS | 117.39 | 69.88 | 8.40 |
+| 4 | Hibana (Reloaded) | MAS | 116.48 | 75.64 | 7.70 |
+| 5 | Shades of Day | MAS | 115.63 | 68.83 | 8.40 |
+| 6 | Transparent Blue | MAS | 113.79 | 65.40 | 8.70 |
+| 7 | Ice Cream Magic | MAS | 112.62 | 76.10 | 7.40 |
+| 8 | Kyōran Kayo feat. shully | MAS | 110.68 | 68.75 | 8.05 |
+| 9 | Shooting Star (GITADORA ver.) | MAS | 109.89 | 66.20 | 8.30 |
+| 10 | Flame Barrier | MAS | 108.61 | 73.39 | 7.40 |
+| 11 | Ramen Messiah: Type A | MAS | 108.42 | 78.57 | 6.90 |
+| 12 | CHECKER FLAG | MAS | 107.72 | 69.95 | 7.70 |
+| 13 | ANEMONE -GITADORA EDITION- | MAS | 107.19 | 76.57 | 7.00 |
+| 14 | Rewrite | MAS | 107.03 | 61.87 | 8.65 |
+| 15 | Metal!! (feat. Tom Morello) | MAS | 104.01 | 71.24 | 7.30 |
+| 16 | Ryugin Unki Tora Fusei feat. Nana Takahashi / 709sec. | MAS | 103.33 | 66.24 | 7.80 |
+| 17 | Inferno | MAS | 103.08 | 75.80 | 6.80 |
+| 18 | Blue and Summer | MAS | 102.59 | 75.44 | 6.80 |
+| 19 | New Order | MAS | 102.54 | 60.68 | 8.45 |
+| 20 | Nike | MAS | 101.34 | 65.81 | 7.70 |
+| 21 | Tenjo Tenka Yuiga Doson | MAS | 97.20 | 66.58 | 7.30 |
+| 22 | Crimson and Azure Rampage (GITADORA ver.) | MAS | 95.36 | 58.87 | 8.10 |
+| 23 | Sunny | MAS | 94.83 | 77.73 | 6.10 |
+| 24 | hide and seek | MAS | 91.55 | 62.71 | 7.30 |
+
+### OTHER — 25 songs · 2439.03
+
+| # | Song | Chart | Skill | Achv % | Diff |
+|---|------|-------|-------|--------|------|
+| 1 | going up | EXT | 122.30 | 72.80 | 8.40 |
+| 2 | REVOLUTION | EXT | 115.53 | 74.06 | 7.80 |
+| 3 | moonlight butterfly | EXT | 115.35 | 79.01 | 7.30 |
+| 4 | Die Zauberflote | EXT | 111.39 | 67.51 | 8.25 |
+| 5 | Onihime | EXT | 110.77 | 65.55 | 8.45 |
+| 6 | A message to the fainting rabbit | EXT | 110.39 | 72.63 | 7.60 |
+| 7 | Gently, the rain sings for me | EXT | 109.11 | 77.94 | 7.00 |
+| 8 | Concertino in Blue | EXT | 108.25 | 60.14 | 9.00 |
+| 9 | Guren | EXT | 106.60 | 72.52 | 7.35 |
+| 10 | "I'm going to get hurt..." she said. | EXT | 106.11 | 62.79 | 8.45 |
+| 11 | bud | EXT | 105.16 | 62.23 | 8.45 |
+| 12 | Arcadia | MAS | 100.36 | 59.74 | 8.40 |
+| 13 | Blue Moon | MAS | 95.21 | 68.01 | 7.00 |
+| 14 | HANABI | MAS | 95.02 | 56.23 | 8.45 |
+| 15 | Just a sunny day for you | MAS | 93.14 | 73.34 | 6.35 |
+| 16 | Shooting Star ★☆ | MAS | 92.60 | 62.57 | 7.40 |
+| 17 | The colors are scattered and scattered. | MAS | 88.15 | 63.88 | 6.90 |
+| 18 | Dreamer's High | MAS | 88.09 | 60.34 | 7.30 |
+| 19 | Clowing folly | MAS | 85.93 | 58.86 | 7.30 |
+| 20 | Sky Blue Days | MAS | 85.59 | 59.44 | 7.20 |
+| 21 | Under the same season as you | EXT | 81.30 | 58.92 | 6.90 |
+| 22 | The Shape of Happiness | EXT | 80.75 | 57.68 | 7.00 |
+| 23 | WONDER TRIP | MAS | 78.98 | 53.73 | 7.35 |
+| 24 | Beyond the light | EXT | 77.74 | 54.37 | 7.15 |
+| 25 | Records of the Far East | EXT | 75.21 | 51.52 | 7.30 |
