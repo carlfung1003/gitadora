@@ -537,7 +537,13 @@
     color: var(--accent-2);
     text-decoration: none;
     opacity: 0.8;
+    position: relative;
   }
+  /* 44px finger target on the 13px-tall "▸ alt video" links, look unchanged.
+     Vertical reach stops short of the diff cells above (19px gap) and the
+     note below (23px); horizontal reach meets in the 8px gap between links.
+     Assumes the alts never wrap (true at every width today). */
+  .alts a::after { content: ""; position: absolute; inset: -15px -7px -16px; }
   .alts a:hover { opacity: 1; text-decoration: underline; }
 
   /* FOOTER */
